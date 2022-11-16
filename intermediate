@@ -1,0 +1,152 @@
+SELECT COUNT(*)
+  FROM tutorial.aapl_historical_stock_price
+  
+  SELECT * FROM tutorial.aapl_historical_stock_price
+  
+  SELECT COUNT(high)
+  FROM tutorial.aapl_historical_stock_price
+  
+  SELECT COUNT(date)
+  FROM tutorial.aapl_historical_stock_price
+  
+  SELECT COUNT(date) AS count_of_date
+  FROM tutorial.aapl_historical_stock_price
+  
+  SELECT COUNT(date) AS "Count Of Date"
+  FROM tutorial.aapl_historical_stock_price
+  
+  -sum of all
+  
+  SELECT SUM(volume)
+  FROM tutorial.aapl_historical_stock_price
+  
+  - find low and high val
+  SELECT MIN(volume) AS min_volume,
+       MAX(volume) AS max_volume
+  FROM tutorial.aapl_historical_stock_price
+  
+  SELECT AVG(high)
+  FROM tutorial.aapl_historical_stock_price
+ WHERE high IS NOT NULL
+ 
+ - average
+ 
+ SELECT AVG(high)
+  FROM tutorial.aapl_historical_stock_price
+  
+  
+  - count year and month
+  
+  SELECT year,
+       month,
+       COUNT(*) AS count
+  FROM tutorial.aapl_historical_stock_price
+ GROUP BY year, month
+ 
+ - order and count
+ 
+ SELECT year,
+       month,
+       COUNT(*) AS count
+  FROM tutorial.aapl_historical_stock_price
+ GROUP BY year, month
+ ORDER BY month, year
+ 
+ checking monthly highs with HAVING 
+ 
+ SELECT year,
+       month,
+       MAX(high) AS month_high
+  FROM tutorial.aapl_historical_stock_price
+ GROUP BY year, month
+HAVING MAX(high) > 400
+ ORDER BY year, month
+ 
+ basically a if statement to search fo certain thing
+ 
+ SELECT player_name,
+       year,
+       CASE WHEN year = 'SR' THEN 'yes'
+            ELSE NULL END AS is_a_senior
+  FROM benn.college_football_players
+  
+  - gets one of each. DINSTINCT PAIRS
+  
+  SELECT DISTINCT year, month
+  FROM tutorial.aapl_historical_stock_price
+  
+  SELECT teams.conference AS conference,
+       AVG(players.weight) AS average_weight
+  FROM benn.college_football_players players
+  JOIN benn.college_football_teams teams
+    ON teams.school_name = players.school_name
+ GROUP BY teams.conference
+ ORDER BY AVG(players.weight) DESC
+ 
+ SELECT players.school_name AS players_school_name,
+       teams.school_name AS teams_school_name
+  FROM benn.college_football_players players
+  JOIN benn.college_football_teams teams
+    ON teams.school_name = players.school_name
+    
+   - left join
+    
+    SELECT companies.permalink AS companies_permalink,
+       companies.name AS companies_name,
+       acquisitions.company_permalink AS acquisitions_permalink,
+       acquisitions.acquired_at AS acquired_date
+  FROM tutorial.crunchbase_companies companies
+  JOIN tutorial.crunchbase_acquisitions acquisitions
+    ON companies.permalink = acquisitions.company_permalink
+    
+    SELECT companies.permalink AS companies_permalink,
+       companies.name AS companies_name,
+       acquisitions.company_permalink AS acquisitions_permalink,
+       acquisitions.acquired_at AS acquired_date
+  FROM tutorial.crunchbase_acquisitions acquisitions
+ RIGHT JOIN tutorial.crunchbase_companies companies
+    ON companies.permalink = acquisitions.company_permalink
+    
+    SELECT COUNT(CASE WHEN companies.permalink IS NOT NULL AND acquisitions.company_permalink IS NULL
+                  THEN companies.permalink ELSE NULL END) AS companies_only,
+       COUNT(CASE WHEN companies.permalink IS NOT NULL AND acquisitions.company_permalink IS NOT NULL
+                  THEN companies.permalink ELSE NULL END) AS both_tables,
+       COUNT(CASE WHEN companies.permalink IS NULL AND acquisitions.company_permalink IS NOT NULL
+                  THEN acquisitions.company_permalink ELSE NULL END) AS acquisitions_only
+  FROM tutorial.crunchbase_companies companies
+  FULL JOIN tutorial.crunchbase_acquisitions acquisitions
+    ON companies.permalink = acquisitions.company_permalink
+    
+    - put them next to eachother with similar stuff
+    
+    SELECT *
+  FROM tutorial.crunchbase_investments_part1
+
+ UNION ALL
+
+ SELECT *
+   FROM tutorial.crunchbase_investments_part2
+
+
+==== combinging two files and combining tables
+
+SELECT companies.permalink,
+       companies.name,
+       companies.status,
+       COUNT(investments.investor_permalink) AS investors
+  FROM tutorial.crunchbase_companies companies
+  LEFT JOIN tutorial.crunchbase_investments_part1 investments
+    ON companies.permalink = investments.company_permalink
+ WHERE investments.funded_year > companies.founded_year + 5
+ GROUP BY 1,2, 3
+ 
+ SELECT DISTINCT japan_investments.company_name,
+	   japan_investments.company_permalink
+  FROM tutorial.crunchbase_investments_part1 japan_investments
+  JOIN tutorial.crunchbase_investments_part1 gb_investments
+    ON japan_investments.company_name = gb_investments.company_name
+   AND gb_investments.investor_country_code = 'GBR'
+   AND gb_investments.funded_at > japan_investments.funded_at
+ WHERE japan_investments.investor_country_code = 'JPN'
+ ORDER BY 1
+ 
